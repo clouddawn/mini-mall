@@ -12,13 +12,15 @@ datasource db {
 
 // ── 用户 ──────────────────────────────────────────────
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  password  String // bcrypt 哈希
-  role      String   @default("USER") // "USER" | "ADMIN"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  name            String
+  password        String // bcrypt 哈希
+  role            String   @default("USER") // "USER" | "ADMIN"
+  totalSpent      Int      @default(0) // 累计消费金额（分），已支付订单实付之和
+  membershipLevel Int      @default(0) // 0=普通用户, 1=心悦1, 2=心悦2, 3=心悦3
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   cartItems CartItem[]
   orders    Order[]
@@ -75,7 +77,9 @@ model Order {
   id              Int        @id @default(autoincrement())
   userId          Int
   status          String     @default("PENDING") // PENDING | PAID | SHIPPED | DELIVERED | CANCELLED
-  total           Int // 单位：分
+  total           Int // 实付金额（分），已含会员折扣
+  originalTotal   Int? // 折扣前原价（分），无折扣时为 null
+  discountAmount  Int        @default(0) // 会员折扣金额（分），无折扣时为 0
   shippingName    String?
   shippingAddress String?
   shippingPhone   String?

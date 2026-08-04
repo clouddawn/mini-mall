@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
+import { calcCartTotal, applyDiscount, getTier } from '@/lib/membership'
 import { CartItemRow } from '@/components/cart/CartItemRow'
 import { CartSummary } from '@/components/cart/CartSummary'
 
@@ -17,7 +18,12 @@ export default async function CartPage() {
     orderBy: { createdAt: 'desc' },
   })
 
-  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  // 按当前会员等级预估折扣（下单时以服务器计算为准）
+  const user = await prisma.user.findUnique({ where: { id: session.userId } })
+  const level = user?.membershipLevel ?? 0
+  const originalTotal = calcCartTotal(items)
+  const { discountedTotal, discountAmount } = applyDiscount(originalTotal, level)
+  const tier = getTier(level)
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
 
   return (
@@ -45,7 +51,14 @@ export default async function CartPage() {
             </ul>
           </div>
           <aside className="lg:col-span-1">
-            <CartSummary total={total} itemCount={itemCount} />
+            <CartSummary
+              total={discountedTotal}
+              itemCount={itemCount}
+              originalTotal={originalTotal}
+              discountAmount={discountAmount}
+              tierName={tier.name}
+              tierRate={tier.rate}
+            />
           </aside>
         </div>
       )}

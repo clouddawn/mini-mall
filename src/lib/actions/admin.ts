@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth'
+import { getMembershipLevel } from '@/lib/membership'
 import type { OrderStatus } from '@/types'
 
 export type AdminActionResult = { error: string } | { success: true }
@@ -215,10 +216,28 @@ export async function updateOrderStatusAction(orderId: number, status: string): 
         await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } })
       }
     }
+
+    // 累计消费与等级同步：变更为已支付则累加；已支付被取消则回退（可能降级）
+    const user = await tx.user.findUnique({ where: { id: order.userId } })
+    if (!user) return
+    let newTotalSpent = user.totalSpent
+    if (newStatus === 'PAID' && oldStatus !== 'PAID') {
+      newTotalSpent += order.total
+    } else if (newStatus === 'CANCELLED' && oldStatus === 'PAID') {
+      newTotalSpent = Math.max(0, newTotalSpent - order.total)
+    }
+    if (newTotalSpent !== user.totalSpent) {
+      const newLevel = getMembershipLevel(newTotalSpent)
+      await tx.user.update({
+        where: { id: order.userId },
+        data: { totalSpent: newTotalSpent, membershipLevel: newLevel },
+      })
+    }
   })
 
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${orderId}`)
   revalidatePath(`/orders/${orderId}`)
+  revalidatePath('/profile')
   return { success: true }
 }

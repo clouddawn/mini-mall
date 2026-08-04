@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { formatPrice } from '@/types'
+import { calcCartTotal, applyDiscount, getTier, discountLabel } from '@/lib/membership'
 import { ShippingForm } from '@/components/checkout/ShippingForm'
 
 export const metadata: Metadata = { title: '结算 · Mini Mall' }
@@ -19,7 +20,10 @@ export default async function CheckoutPage() {
   })
   if (items.length === 0) redirect('/cart')
 
-  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  const user = await prisma.user.findUnique({ where: { id: session.userId } })
+  const originalTotal = calcCartTotal(items)
+  const { discountedTotal, discountAmount } = applyDiscount(originalTotal, user?.membershipLevel ?? 0)
+  const tier = getTier(user?.membershipLevel ?? 0)
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
 
   return (
@@ -58,10 +62,22 @@ export default async function CheckoutPage() {
                 <dt>商品件数</dt>
                 <dd className="num">{itemCount} 件</dd>
               </div>
+              {discountAmount > 0 && (
+                <>
+                  <div className="flex justify-between text-ink-soft">
+                    <dt>商品原价</dt>
+                    <dd className="num line-through">{formatPrice(originalTotal)}</dd>
+                  </div>
+                  <div className="flex justify-between text-vermilion">
+                    <dt>{tier.name}会员 · {discountLabel(tier.rate)}</dt>
+                    <dd className="num">-{formatPrice(discountAmount)}</dd>
+                  </div>
+                </>
+              )}
               <div className="hairline !my-4" />
               <div className="flex items-baseline justify-between">
                 <dt>应付合计</dt>
-                <dd className="num text-2xl font-medium text-vermilion">{formatPrice(total)}</dd>
+                <dd className="num text-2xl font-medium text-vermilion">{formatPrice(discountedTotal)}</dd>
               </div>
             </dl>
             <p className="mt-4 text-[10px] leading-4 text-ink-faint">

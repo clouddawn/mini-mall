@@ -146,17 +146,19 @@ async function main() {
   }
   console.log(`🖼️  生成本地占位图 ${imgCount} 张`)
 
-  // 为演示用户准备一个示例购物车 + 一笔示例订单
+  // 为演示用户准备一个示例购物车 + 两笔示例订单（含一笔心悦1会员折扣订单）
   const sampleProducts = await prisma.product.findMany({ take: 3 })
   await prisma.cartItem.create({
     data: { userId: user.id, productId: sampleProducts[0].id, quantity: 1 },
   })
 
+  // 订单A：普通用户时期，无折扣
+  const orderATotal = sampleProducts.reduce((s, p) => s + p.price, 0)
   await prisma.order.create({
     data: {
       userId: user.id,
       status: 'DELIVERED',
-      total: sampleProducts.reduce((s, p) => s + p.price, 0),
+      total: orderATotal,
       shippingName: '演示用户',
       shippingAddress: '上海市静安区示例路 1 号 101 室',
       shippingPhone: '13800000000',
@@ -169,7 +171,36 @@ async function main() {
   for (const p of sampleProducts) {
     await prisma.product.update({ where: { id: p.id }, data: { stock: { decrement: 1 } } })
   }
-  console.log('🧺 演示用户: 1 件购物车 + 1 笔已完成订单')
+
+  // 订单B：累计消费达标后，心悦1会员 9.8 折订单
+  const originalTotal = 800_000 // ¥8,000
+  const orderBTotal = Math.floor(originalTotal * 0.98) // 784,000 分
+  await prisma.order.create({
+    data: {
+      userId: user.id,
+      status: 'DELIVERED',
+      total: orderBTotal,
+      originalTotal,
+      discountAmount: originalTotal - orderBTotal,
+      shippingName: '演示用户',
+      shippingAddress: '上海市静安区示例路 1 号 101 室',
+      shippingPhone: '13800000000',
+      items: {
+        create: sampleProducts.map((p) => ({ productId: p.id, quantity: 2, price: p.price })),
+      },
+    },
+  })
+  for (const p of sampleProducts) {
+    await prisma.product.update({ where: { id: p.id }, data: { stock: { decrement: 2 } } })
+  }
+
+  // 累计消费 = 两笔订单实付之和 → 心悦1 级
+  const totalSpent = orderATotal + orderBTotal
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { totalSpent, membershipLevel: 1 },
+  })
+  console.log('🧺 演示用户: 1 件购物车 + 2 笔已完成订单（累计 ¥' + (totalSpent / 100).toFixed(2) + '，心悦1）')
 
   console.log('✅ 种子数据写入完成')
 }

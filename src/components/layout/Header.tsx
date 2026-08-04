@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { getSessionSafe } from '@/lib/auth'
+import { getTier } from '@/lib/membership'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 
 function CartIcon({ count }: { count: number }) {
@@ -41,6 +42,9 @@ async function UserMenu() {
       </div>
     )
   }
+  const user = await prisma.user.findUnique({ where: { id: session.userId } })
+  const tier = getTier(user?.membershipLevel ?? 0)
+  const isMember = tier.level > 0
   return (
     <div className="flex items-center gap-3">
       {session.role === 'ADMIN' && (
@@ -48,7 +52,16 @@ async function UserMenu() {
           后台
         </Link>
       )}
-      <span className="hidden text-xs text-ink-faint sm:inline">{session.role === 'ADMIN' ? '管理员' : ''}</span>
+      <Link href="/profile" className="flex items-center gap-1.5" title="我的">
+        <span className="hidden text-xs text-ink-soft transition-colors hover:text-ink sm:inline">
+          {user?.name ?? '我的'}
+        </span>
+        {isMember && (
+          <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+            {tier.name}
+          </span>
+        )}
+      </Link>
       <LogoutButton />
     </div>
   )

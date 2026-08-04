@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
+import { calcCartTotal, getMembershipLevel, applyDiscount } from '@/lib/membership'
 
 export type OrderActionResult = { error: string } | { success: true }
 
@@ -39,7 +40,10 @@ export async function placeOrderAction(prev: OrderActionResult | null, formData:
   })
   if (cartItems.length === 0) return { error: '购物车是空的' }
 
-  const total = cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  // 按用户当前会员等级计算折扣（升级后生效，不追溯历史订单）
+  const user = await prisma.user.findUnique({ where: { id: session.userId } })
+  const originalTotal = calcCartTotal(cartItems)
+  const { discountedTotal, discountAmount } = applyDiscount(originalTotal, user?.membershipLevel ?? 0)
 
   let orderId: number
   try {
@@ -59,7 +63,9 @@ export async function placeOrderAction(prev: OrderActionResult | null, formData:
       const created = await tx.order.create({
         data: {
           userId: session.userId,
-          total,
+          total: discountedTotal,
+          originalTotal: discountAmount > 0 ? originalTotal : null,
+          discountAmount,
           shippingName: parsed.data.name,
           shippingAddress: parsed.data.address,
           shippingPhone: parsed.data.phone,
@@ -88,7 +94,7 @@ export async function placeOrderAction(prev: OrderActionResult | null, formData:
   redirect(`/orders/${orderId}`)
 }
 
-/** 模拟支付：PENDING → PAID */
+/** 模拟支付：PENDING → PAID，并累计消费、按累计金额重算会员等级 */
 export async function payOrderAction(orderId: number): Promise<OrderActionResult> {
   const session = await getSession()
 
@@ -96,9 +102,22 @@ export async function payOrderAction(orderId: number): Promise<OrderActionResult
   if (!order) return { error: '订单不存在' }
   if (order.status !== 'PENDING') return { error: '当前状态不可支付' }
 
-  await prisma.order.update({ where: { id: orderId }, data: { status: 'PAID' } })
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({ where: { id: orderId }, data: { status: 'PAID' } })
+    // 累计消费 + 重算等级（原子自增，并发支付也不丢失）
+    const updated = await tx.user.update({
+      where: { id: session.userId },
+      data: { totalSpent: { increment: order.total } },
+    })
+    const newLevel = getMembershipLevel(updated.totalSpent)
+    if (updated.membershipLevel !== newLevel) {
+      await tx.user.update({ where: { id: session.userId }, data: { membershipLevel: newLevel } })
+    }
+  })
+
   revalidatePath(`/orders/${orderId}`)
   revalidatePath('/admin/orders')
+  revalidatePath('/profile')
   return { success: true }
 }
 
@@ -123,9 +142,21 @@ export async function cancelOrderAction(orderId: number): Promise<OrderActionRes
         data: { stock: { increment: item.quantity } }, // 归还库存
       })
     }
+    // 已支付的订单取消后，回退累计消费并重算等级（可能降级）
+    if (order.status === 'PAID') {
+      const updated = await tx.user.update({
+        where: { id: session.userId },
+        data: { totalSpent: { decrement: order.total } },
+      })
+      const newLevel = getMembershipLevel(Math.max(0, updated.totalSpent))
+      if (updated.membershipLevel !== newLevel) {
+        await tx.user.update({ where: { id: session.userId }, data: { membershipLevel: newLevel } })
+      }
+    }
   })
 
   revalidatePath(`/orders/${orderId}`)
   revalidatePath('/admin/orders')
+  revalidatePath('/profile')
   return { success: true }
 }

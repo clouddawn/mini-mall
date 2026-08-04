@@ -1,6 +1,7 @@
 // 与数据库存储值对应的联合类型
 export type OrderStatus = 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
 export type UserRole = 'USER' | 'ADMIN'
+export type MembershipLevel = 0 | 1 | 2 | 3
 
 // 认证会话
 export interface Session {

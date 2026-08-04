@@ -149,6 +149,18 @@ export default async function OrderDetailPage({ params }: OrderDetailProps) {
               </div>
             </dl>
             <div className="hairline my-4" />
+            {order.discountAmount > 0 && order.originalTotal != null && (
+              <>
+                <div className="mb-2 flex items-baseline justify-between text-sm text-ink-soft">
+                  <span>商品原价</span>
+                  <span className="num line-through">{formatPrice(order.originalTotal)}</span>
+                </div>
+                <div className="mb-2 flex items-baseline justify-between text-sm text-vermilion">
+                  <span>会员折扣</span>
+                  <span className="num">-{formatPrice(order.discountAmount)}</span>
+                </div>
+              </>
+            )}
             <div className="flex items-baseline justify-between">
               <span className="text-sm">订单金额</span>
               <span className="num text-2xl font-medium text-vermilion">{formatPrice(order.total)}</span>
