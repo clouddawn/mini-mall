@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* 纸墨色系 — 暖白底、墨黑字、朱砂红点缀 */
+  --color-paper: #faf8f4;
+  --color-ink: #1c1a17;
+  --color-ink-soft: #6f675c;
+  --color-ink-faint: #a39a8c;
+  --color-vermilion: #c8452f;
+  --color-vermilion-dark: #a63622;
+  --color-vermilion-light: #f3e3dd;
+  --color-line: #e6e0d5;
+  --color-card: #ffffff;
+  --color-sage: #6f8f5f;
+  --color-sage-light: #e8efe3;
+  --color-gold: #b08a2e;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 字体：中文衬线标题 + 无衬线正文 + 西文展示数字 */
+  --font-display: var(--font-serif-sc), serif;
+  --font-sans: var(--font-sans-sc), sans-serif;
+  --font-num: var(--font-fraunces), serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* 纸面颗粒质感（超轻噪点，营造印刷感） */
+.paper-noise {
+  background-image: radial-gradient(rgba(28, 26, 23, 0.025) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+/* 细线分隔 */
+.hairline {
+  border-top: 1px solid var(--color-line);
+}
+
+/* 通用工具类 */
+@utility input-base {
+  @apply w-full rounded-none border border-ink/20 bg-white px-3 py-2 text-sm text-ink outline-none transition-colors;
+  &:focus {
+    @apply border-vermilion;
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium tracking-wide transition-all duration-200 select-none disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* 数字字体 */
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
 }

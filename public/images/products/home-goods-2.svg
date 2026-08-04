@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
+<rect width="320" height="240" fill="#e3ebf2"/>
+<circle cx="160" cy="120" r="70" fill="none" stroke="#5b7c99" stroke-width="2"/>
+<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#5b7c99">陶土香薰炉</text>
+</svg>
