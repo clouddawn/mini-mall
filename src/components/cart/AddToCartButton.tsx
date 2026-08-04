@@ -18,11 +18,17 @@ export function AddToCartButton({ productId, stock, quantity = 1 }: AddToCartBut
 
   function handleClick() {
     startTransition(async () => {
-      const result = await addToCart(productId, quantity)
-      if ('success' in result) {
-        router.refresh() // 刷新 Header 中的购物车数量
-      } else if (result.redirect) {
-        router.push('/login')
+      try {
+        const result = await addToCart(productId, quantity)
+        if ('success' in result) {
+          router.refresh() // 刷新 Header 中的购物车数量
+        } else if (result.redirect) {
+          router.push('/login')
+        } else {
+          alert(result.error)
+        }
+      } catch {
+        alert('操作失败，请重试')
       }
     })
   }
