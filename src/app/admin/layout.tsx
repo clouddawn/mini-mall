@@ -2,15 +2,14 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/auth'
+import { getSession } from '@/lib/auth'
 import { AdminSidebar } from '@/components/layout/AdminSidebar'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 
 export const metadata: Metadata = { title: '管理后台 · Mini Mall' }
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  // 角色守卫：非管理员重定向回首页
-  const session = await requireAdmin()
+  const session = await getSession()
   const user = await prisma.user.findUnique({ where: { id: session.userId } })
 
   return (

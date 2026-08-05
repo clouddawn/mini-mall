@@ -39,6 +39,9 @@ export default async function HomePage() {
               <Link href="/register" className="btn border border-ink/30 px-6 py-3 hover:border-ink hover:bg-ink hover:text-paper">
                 注册账号
               </Link>
+              <Link href="/admin" className="btn border border-ink/30 px-6 py-3 hover:border-ink hover:bg-ink hover:text-paper">
+                管理后台
+              </Link>
             </div>
           </div>
 
