@@ -34,17 +34,18 @@ export function UserForm({ user, isSelf }: UserFormProps) {
         <label htmlFor="role" className="block text-xs font-medium tracking-widest text-ink-soft uppercase">
           角色
         </label>
-        <select
-          id="role"
-          name="role"
-          defaultValue={user.role}
-          disabled={isSelf}
-          className="input-base disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="USER">用户</option>
-          <option value="ADMIN">管理员</option>
-        </select>
-        {isSelf && <p className="text-xs text-ink-faint">不能修改自己的角色</p>}
+        {isSelf ? (
+          <>
+            <input type="hidden" name="role" value={user.role} />
+            <p className="input-base flex items-center bg-ink/5 text-ink-soft">{user.role === 'ADMIN' ? '管理员' : '用户'}</p>
+            <p className="text-xs text-ink-faint">不能修改自己的角色</p>
+          </>
+        ) : (
+          <select id="role" name="role" defaultValue={user.role} className="input-base">
+            <option value="USER">用户</option>
+            <option value="ADMIN">管理员</option>
+          </select>
+        )}
       </div>
 
       <div className="flex gap-3 pt-2">

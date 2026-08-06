@@ -216,10 +216,23 @@ export async function updateUserAction(
     return { error: '不能修改自己的角色' }
   }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { name: parsed.data.name, role: parsed.data.role },
-  })
+  // name 加了 @unique，修改昵称需检查是否已被其他用户占用
+  if (parsed.data.name !== user.name) {
+    const nameExists = await prisma.user.findUnique({ where: { name: parsed.data.name } })
+    if (nameExists) return { error: '该昵称已被其他用户使用' }
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { name: parsed.data.name, role: parsed.data.role },
+    })
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      return { error: '该昵称已被其他用户使用' }
+    }
+    throw e
+  }
   revalidatePath('/admin/users')
   revalidatePath(`/admin/users/${userId}`)
   return { success: true }

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { formatPrice } from '@/types'
 import { MEMBERSHIP_TIERS, getTier, getNextTier, discountLabel } from '@/lib/membership'
+import { EditNickname } from '@/components/profile/EditNickname'
 
 export const metadata: Metadata = { title: '我的 · Mini Mall' }
 export const dynamic = 'force-dynamic'
@@ -39,10 +40,11 @@ export default async function ProfilePage() {
             <p className="mb-4 text-[10px] tracking-[0.3em] text-ink-faint uppercase">心悦会员</p>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="font-display text-2xl font-semibold">
+                <div className="font-display text-2xl font-semibold">
                   {user.name}
                   {tier.level > 0 && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 align-middle text-xs font-medium text-amber-800">{tier.name}</span>}
-                </p>
+                  <EditNickname currentName={user.name} />
+                </div>
                 <p className="num mt-1 text-sm text-ink-soft">{user.email}</p>
               </div>
               {tier.level > 0 && (
