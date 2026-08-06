@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/admin/products', label: '商品管理', icon: '□' },
   { href: '/admin/categories', label: '分类管理', icon: '⌗' },
   { href: '/admin/orders', label: '订单管理', icon: '▤' },
+  { href: '/admin/users', label: '用户管理', icon: '◇' },
 ]
 
 export function AdminSidebar() {

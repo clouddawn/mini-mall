@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
-import { deleteProductAction, deleteCategoryAction } from '@/lib/actions/admin'
+import { deleteProductAction, deleteCategoryAction, deleteUserAction } from '@/lib/actions/admin'
 
 interface DeleteButtonProps {
   id: number
-  kind: 'product' | 'category'
+  kind: 'product' | 'category' | 'user'
   confirmText: string
 }
 
@@ -14,11 +14,16 @@ export function DeleteButton({ id, kind, confirmText }: DeleteButtonProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
 
+  const deleteActions = {
+    product: deleteProductAction,
+    category: deleteCategoryAction,
+    user: deleteUserAction,
+  } as const
+
   function handleDelete() {
     if (!confirm(confirmText)) return
     startTransition(async () => {
-      const result =
-        kind === 'product' ? await deleteProductAction(id) : await deleteCategoryAction(id)
+      const result = await deleteActions[kind](id)
       if ('error' in result) alert(result.error)
       router.refresh()
     })

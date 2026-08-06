@@ -7,13 +7,14 @@ export interface MembershipTier {
   name: string
   threshold: number // 累计消费门槛（分）
   rate: number // 折扣率，1 = 无折扣
+  badge: string // 徽章 Tailwind 配色（供列表/详情页统一使用）
 }
 
 export const MEMBERSHIP_TIERS: MembershipTier[] = [
-  { level: 0, name: '普通用户', threshold: 0, rate: 1 },
-  { level: 1, name: '心悦1', threshold: 800_000, rate: 0.98 }, // ¥8,000 → 9.8 折
-  { level: 2, name: '心悦2', threshold: 8_000_000, rate: 0.95 }, // ¥80,000 → 9.5 折
-  { level: 3, name: '心悦3', threshold: 80_000_000, rate: 0.9 }, // ¥800,000 → 9 折
+  { level: 0, name: '普通用户', threshold: 0, rate: 1, badge: '' },
+  { level: 1, name: '心悦1', threshold: 800_000, rate: 0.98, badge: 'bg-amber-100 text-amber-800' }, // ¥8,000 → 9.8 折
+  { level: 2, name: '心悦2', threshold: 8_000_000, rate: 0.95, badge: 'bg-blue-100 text-blue-800' }, // ¥80,000 → 9.5 折
+  { level: 3, name: '心悦3', threshold: 80_000_000, rate: 0.9, badge: 'bg-violet-100 text-violet-800' }, // ¥800,000 → 9 折
 ]
 
 /** 根据累计消费金额计算会员等级 */

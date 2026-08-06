@@ -188,6 +188,72 @@ export async function deleteCategoryAction(id: number): Promise<AdminActionResul
   return { success: true }
 }
 
+// ── 用户 ──────────────────────────────────────────────
+
+const userUpdateSchema = z.object({
+  name: z.string().trim().min(1, '请输入昵称').max(30, '昵称最长 30 字'),
+  role: z.enum(['USER', 'ADMIN']),
+})
+
+/** 管理端修改用户昵称与角色（会员等级由累计消费自动计算，不开放手动改） */
+export async function updateUserAction(
+  _prev: AdminActionResult | null,
+  userId: number,
+  formData: FormData,
+): Promise<AdminActionResult> {
+  const session = await requireAdmin()
+  const parsed = userUpdateSchema.safeParse({
+    name: formData.get('name'),
+    role: formData.get('role'),
+  })
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? '输入有误' }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) return { error: '用户不存在' }
+
+  // 不能把自己降级为 USER，防止管理员失去后台访问权限
+  if (userId === session.userId && parsed.data.role !== 'ADMIN') {
+    return { error: '不能修改自己的角色' }
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { name: parsed.data.name, role: parsed.data.role },
+  })
+  revalidatePath('/admin/users')
+  revalidatePath(`/admin/users/${userId}`)
+  return { success: true }
+}
+
+/** 管理端删除用户；有关联订单或购物车的用户不允许删除 */
+export async function deleteUserAction(userId: number): Promise<AdminActionResult> {
+  const session = await requireAdmin()
+  if (userId === session.userId) return { error: '不能删除自己的账号' }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { _count: { select: { orders: true, cartItems: true } } },
+  })
+  if (!user) return { error: '用户不存在' }
+  if (user._count.orders > 0 || user._count.cartItems > 0) {
+    return {
+      error: `该用户有 ${user._count.orders} 笔订单、${user._count.cartItems} 件购物车商品，无法删除`,
+    }
+  }
+
+  try {
+    await prisma.user.delete({ where: { id: userId } })
+  } catch (e) {
+    // 竞态下仍有外键约束兜底
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') {
+      return { error: '该用户存在关联数据，无法删除' }
+    }
+    throw e
+  }
+  revalidatePath('/admin/users')
+  return { success: true }
+}
+
 // ── 订单状态 ──────────────────────────────────────────
 
 const statusSchema = z.object({
