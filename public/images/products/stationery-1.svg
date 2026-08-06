@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e3ebf2"/>
-<rect x="90" y="50" width="140" height="140" fill="none" stroke="#5b7c99" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#5b7c99">牛皮纸手账本 A5</text>
+
+    <path d="M160 70 L160 180" stroke="#5b7c99" stroke-width="2"/>
+    <path d="M160 70 L90 85 L85 180 L160 180 Z" fill="none" stroke="#5b7c99" stroke-width="3"/>
+    <path d="M160 70 L230 85 L235 180 L160 180 Z" fill="none" stroke="#5b7c99" stroke-width="3"/>
+    <path d="M100 105 L145 100 M100 125 L145 120 M100 145 L145 140 M100 165 L145 160" stroke="#5b7c99" stroke-width="2"/>
+    <path d="M220 105 L175 100 M220 125 L175 120 M220 145 L175 140 M220 165 L175 160" stroke="#5b7c99" stroke-width="2"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#5b7c99">牛皮纸手账本 A5</text>
 </svg>

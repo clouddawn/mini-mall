@@ -13,7 +13,7 @@ import path from 'node:path'
 
 const prisma = new PrismaClient()
 
-// 生成简约几何占位图（纸墨色系的 SVG）
+// 生成产品专属卡通图（纸墨色系的线条风格 SVG）
 const PALETTE = [
   ['#c8452f', '#f3e3dd'], // 朱砂
   ['#1c1a17', '#e6e0d5'], // 墨黑
@@ -22,17 +22,121 @@ const PALETTE = [
   ['#5b7c99', '#e3ebf2'], // 雾蓝
 ]
 
-function makeSvg(name: string, i: number): string {
+// 各产品的卡通图形（元素使用 fg 描边，bg 背景）
+const PRODUCT_ART: Record<string, (fg: string) => string> = {
+  // ── 咖啡器具 ──
+  'coffee-tools-1': (c) => `
+    <path d="M110 190 L130 70 L190 70 L210 190 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M150 70 L150 55 L170 55 L170 70" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M145 55 L155 40 L165 55 Z" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M125 90 L195 90 L175 120 L145 120 Z" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M135 120 L165 120 L155 150 L145 150 Z" fill="none" stroke="${c}" stroke-width="2"/>`,
+  'coffee-tools-2': (c) => `
+    <path d="M120 60 L140 175 L180 175 L200 60 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M118 70 L202 70" stroke="${c}" stroke-width="2"/>
+    <path d="M145 90 L175 90 M140 110 L180 110 M136 130 L184 130" stroke="${c}" stroke-width="2"/>
+    <path d="M158 175 L162 188" stroke="${c}" stroke-width="3"/>
+    <path d="M135 60 L115 45 M185 60 L205 45" stroke="${c}" stroke-width="2"/>`,
+  'coffee-tools-3': (c) => `
+    <path d="M120 65 L110 190 L210 190 L200 65 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M120 65 C120 40 200 40 200 65" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M110 100 L85 100 L85 120 L105 120" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M125 110 L195 110 M120 140 L200 140 M116 170 L204 170" stroke="${c}" stroke-width="2"/>
+    <path d="M140 175 L150 185 L160 175" fill="none" stroke="${c}" stroke-width="2"/>`,
+  'coffee-tools-4': (c) => `
+    <circle cx="150" cy="150" r="45" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M150 105 C150 75 200 70 205 55" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M205 55 L215 48 L208 62 Z" fill="${c}"/>
+    <path d="M115 135 L85 120 L90 95 L115 110" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M150 175 L150 195 M135 195 L165 195" stroke="${c}" stroke-width="2"/>`,
+
+  // ── 文具 ──
+  'stationery-1': (c) => `
+    <path d="M160 70 L160 180" stroke="${c}" stroke-width="2"/>
+    <path d="M160 70 L90 85 L85 180 L160 180 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M160 70 L230 85 L235 180 L160 180 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M100 105 L145 100 M100 125 L145 120 M100 145 L145 140 M100 165 L145 160" stroke="${c}" stroke-width="2"/>
+    <path d="M220 105 L175 100 M220 125 L175 120 M220 145 L175 140 M220 165 L175 160" stroke="${c}" stroke-width="2"/>`,
+  'stationery-2': (c) => `
+    <path d="M140 55 L200 55 L205 175 L145 175 L140 55 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M145 55 L205 175" stroke="${c}" stroke-width="1"/>
+    <path d="M160 175 L170 205 L188 175 Z" fill="${c}"/>
+    <path d="M132 70 L115 70 L110 85" fill="none" stroke="${c}" stroke-width="3"/>`,
+  'stationery-3': (c) => `
+    <rect x="115" y="80" width="90" height="95" rx="8" fill="none" stroke="${c}" stroke-width="3"/>
+    <rect x="145" y="55" width="30" height="30" rx="5" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M120 120 L200 120" stroke="${c}" stroke-width="2"/>
+    <path d="M200 175 L215 190 L205 190 L220 200" fill="none" stroke="${c}" stroke-width="2"/>
+    <text x="160" y="160" text-anchor="middle" font-family="serif" font-size="24" fill="${c}">墨</text>`,
+  'stationery-4': (c) => `
+    <path d="M140 55 L180 190" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M175 150 C185 130 195 135 190 155" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M170 170 C180 150 190 155 185 175" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M165 185 C175 165 185 170 180 190" fill="none" stroke="${c}" stroke-width="2"/>`,
+
+  // ── 家居 ──
+  'home-goods-1': (c) => `
+    <path d="M90 60 L230 60 L230 140 C220 130 210 145 200 140 C190 135 180 145 170 140 C160 135 150 145 140 140 C130 135 120 145 110 140 C100 135 95 140 90 140 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M105 75 L215 75 M100 90 L220 90 M95 105 L225 105 M92 120 L228 120" stroke="${c}" stroke-width="1.5" stroke-dasharray="6 6"/>
+    <circle cx="160" cy="100" r="5" fill="${c}"/>`,
+  'home-goods-2': (c) => `
+    <path d="M125 130 L135 190 L185 190 L195 130 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M130 130 L190 130" stroke="${c}" stroke-width="3"/>
+    <path d="M160 130 L160 105" stroke="${c}" stroke-width="2"/>
+    <path d="M160 105 C155 90 140 95 145 78" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M160 95 C165 85 175 90 172 75" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M140 160 L180 160" stroke="${c}" stroke-width="2"/>`,
+  'home-goods-3': (c) => `
+    <path d="M115 70 L105 190 L215 190 L205 70 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M115 70 C115 50 205 50 205 70" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M112 100 L208 100 M110 130 L210 130 M108 160 L212 160" stroke="${c}" stroke-width="2"/>
+    <path d="M130 70 L125 100 M150 70 L148 100 M170 70 L172 100 M190 70 L195 100" stroke="${c}" stroke-width="1.5"/>
+    <path d="M130 130 L125 160 M150 130 L148 160 M170 130 L172 160 M190 130 L195 160" stroke="${c}" stroke-width="1.5"/>`,
+  'home-goods-4': (c) => `
+    <path d="M110 195 L210 195" stroke="${c}" stroke-width="3"/>
+    <path d="M130 195 L135 140 L185 140 L190 195" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M145 140 L150 100 L170 100 L175 140" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M160 100 L160 80" stroke="${c}" stroke-width="2"/>
+    <path d="M160 80 C156 68 148 72 152 60 C156 52 164 52 168 60 C172 72 164 68 160 80 Z" fill="${c}"/>`,
+
+  // ── 电子配件 ──
+  'tech-accessories-1': (c) => `
+    <path d="M90 190 C90 120 230 130 230 80" fill="none" stroke="${c}" stroke-width="4"/>
+    <path d="M90 190 L78 190 L78 160 L95 160 Z" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M230 80 L242 80 L242 105 L225 105 Z" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M110 160 C110 140 210 150 210 105" stroke="${c}" stroke-width="1.5" stroke-dasharray="3 6"/>`,
+  'tech-accessories-2': (c) => `
+    <path d="M160 55 C130 55 120 100 160 105 C200 110 205 185 170 190 L160 190" fill="none" stroke="${c}" stroke-width="4"/>
+    <path d="M160 55 L170 62 M160 105 L170 112 M160 190 L170 183" stroke="${c}" stroke-width="3"/>
+    <circle cx="128" cy="120" r="12" fill="none" stroke="${c}" stroke-width="2"/>
+    <circle cx="195" cy="160" r="12" fill="none" stroke="${c}" stroke-width="2"/>`,
+  'tech-accessories-3': (c) => `
+    <path d="M115 195 L115 120 L205 120 L205 195 Z" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M115 120 L90 195" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M205 120 L230 195" fill="none" stroke="${c}" stroke-width="3"/>
+    <rect x="130" y="75" width="60" height="75" rx="6" fill="none" stroke="${c}" stroke-width="3"/>
+    <path d="M145 135 L165 135 M145 120 L160 120" stroke="${c}" stroke-width="2"/>
+    <path d="M120 70 L200 70 M115 60 L205 60" stroke="${c}" stroke-width="2"/>`,
+  'tech-accessories-4': (c) => `
+    <rect x="85" y="70" width="150" height="100" rx="8" fill="none" stroke="${c}" stroke-width="3"/>
+    ${Array.from({ length: 4 }, (_, r) =>
+      Array.from({ length: 9 }, (_, k) => {
+        const x = 98 + k * 15
+        const y = 85 + r * 20
+        return `<rect x="${x}" y="${y}" width="11" height="8" rx="2" fill="none" stroke="${c}" stroke-width="1.5"/>`
+      }).join(''),
+    ).join('')}
+    <path d="M185 175 L175 195 L165 175" fill="none" stroke="${c}" stroke-width="2"/>
+    <path d="M168 195 L182 195" stroke="${c}" stroke-width="2"/>`,
+}
+
+function makeSvg(slug: string, name: string, i: number): string {
   const [fg, bg] = PALETTE[i % PALETTE.length]
-  const shapes = [
-    `<circle cx="160" cy="120" r="70" fill="none" stroke="${fg}" stroke-width="2"/>`,
-    `<rect x="90" y="50" width="140" height="140" fill="none" stroke="${fg}" stroke-width="2"/>`,
-    `<path d="M100 160 L160 60 L220 160 Z" fill="none" stroke="${fg}" stroke-width="2"/>`,
-  ]
+  const art = PRODUCT_ART[slug]?.(fg) ?? `<circle cx="160" cy="120" r="70" fill="none" stroke="${fg}" stroke-width="2"/>`
   return `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="${bg}"/>
-${shapes[i % shapes.length]}
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="${fg}">${name}</text>
+${art}
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="${fg}">${name}</text>
 </svg>`
 }
 
@@ -127,8 +231,9 @@ async function main() {
     console.log(`📁 分类: ${cat.name}`)
 
     for (const [pi, p] of cat.products.entries()) {
-      const imgName = `${cat.slug}-${pi + 1}.svg`
-      fs.writeFileSync(path.join(imgDir, imgName), makeSvg(p.name, ci * 4 + pi), 'utf8')
+      const slug = `${cat.slug}-${pi + 1}`
+      const imgName = `${slug}.svg`
+      fs.writeFileSync(path.join(imgDir, imgName), makeSvg(slug, p.name, ci * 4 + pi), 'utf8')
       imgCount++
 
       await prisma.product.create({

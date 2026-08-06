@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e3ebf2"/>
-<circle cx="160" cy="120" r="70" fill="none" stroke="#5b7c99" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#5b7c99">陶土香薰炉</text>
+
+    <path d="M125 130 L135 190 L185 190 L195 130 Z" fill="none" stroke="#5b7c99" stroke-width="3"/>
+    <path d="M130 130 L190 130" stroke="#5b7c99" stroke-width="3"/>
+    <path d="M160 130 L160 105" stroke="#5b7c99" stroke-width="2"/>
+    <path d="M160 105 C155 90 140 95 145 78" fill="none" stroke="#5b7c99" stroke-width="2"/>
+    <path d="M160 95 C165 85 175 90 172 75" fill="none" stroke="#5b7c99" stroke-width="2"/>
+    <path d="M140 160 L180 160" stroke="#5b7c99" stroke-width="2"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#5b7c99">陶土香薰炉</text>
 </svg>

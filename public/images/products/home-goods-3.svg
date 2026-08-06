@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#f3e3dd"/>
-<rect x="90" y="50" width="140" height="140" fill="none" stroke="#c8452f" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#c8452f">手工编织收纳篮 L</text>
+
+    <path d="M115 70 L105 190 L215 190 L205 70 Z" fill="none" stroke="#c8452f" stroke-width="3"/>
+    <path d="M115 70 C115 50 205 50 205 70" fill="none" stroke="#c8452f" stroke-width="3"/>
+    <path d="M112 100 L208 100 M110 130 L210 130 M108 160 L212 160" stroke="#c8452f" stroke-width="2"/>
+    <path d="M130 70 L125 100 M150 70 L148 100 M170 70 L172 100 M190 70 L195 100" stroke="#c8452f" stroke-width="1.5"/>
+    <path d="M130 130 L125 160 M150 130 L148 160 M170 130 L172 160 M190 130 L195 160" stroke="#c8452f" stroke-width="1.5"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#c8452f">手工编织收纳篮 L</text>
 </svg>

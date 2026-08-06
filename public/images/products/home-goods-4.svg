@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e6e0d5"/>
-<path d="M100 160 L160 60 L220 160 Z" fill="none" stroke="#1c1a17" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#1c1a17">黄铜烛台 · 矮款</text>
+
+    <path d="M110 195 L210 195" stroke="#1c1a17" stroke-width="3"/>
+    <path d="M130 195 L135 140 L185 140 L190 195" fill="none" stroke="#1c1a17" stroke-width="3"/>
+    <path d="M145 140 L150 100 L170 100 L175 140" fill="none" stroke="#1c1a17" stroke-width="2"/>
+    <path d="M160 100 L160 80" stroke="#1c1a17" stroke-width="2"/>
+    <path d="M160 80 C156 68 148 72 152 60 C156 52 164 52 168 60 C172 72 164 68 160 80 Z" fill="#1c1a17"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#1c1a17">黄铜烛台 · 矮款</text>
 </svg>

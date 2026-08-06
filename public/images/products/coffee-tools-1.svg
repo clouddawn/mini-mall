@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#f3e3dd"/>
-<circle cx="160" cy="120" r="70" fill="none" stroke="#c8452f" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#c8452f">原木手冲咖啡架</text>
+
+    <path d="M110 190 L130 70 L190 70 L210 190 Z" fill="none" stroke="#c8452f" stroke-width="3"/>
+    <path d="M150 70 L150 55 L170 55 L170 70" fill="none" stroke="#c8452f" stroke-width="3"/>
+    <path d="M145 55 L155 40 L165 55 Z" fill="none" stroke="#c8452f" stroke-width="2"/>
+    <path d="M125 90 L195 90 L175 120 L145 120 Z" fill="none" stroke="#c8452f" stroke-width="2"/>
+    <path d="M135 120 L165 120 L155 150 L145 150 Z" fill="none" stroke="#c8452f" stroke-width="2"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#c8452f">原木手冲咖啡架</text>
 </svg>

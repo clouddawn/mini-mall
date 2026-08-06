@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e6e0d5"/>
-<rect x="90" y="50" width="140" height="140" fill="none" stroke="#1c1a17" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#1c1a17">陶瓷手冲滤杯 V60</text>
+
+    <path d="M120 60 L140 175 L180 175 L200 60 Z" fill="none" stroke="#1c1a17" stroke-width="3"/>
+    <path d="M118 70 L202 70" stroke="#1c1a17" stroke-width="2"/>
+    <path d="M145 90 L175 90 M140 110 L180 110 M136 130 L184 130" stroke="#1c1a17" stroke-width="2"/>
+    <path d="M158 175 L162 188" stroke="#1c1a17" stroke-width="3"/>
+    <path d="M135 60 L115 45 M185 60 L205 45" stroke="#1c1a17" stroke-width="2"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#1c1a17">陶瓷手冲滤杯 V60</text>
 </svg>

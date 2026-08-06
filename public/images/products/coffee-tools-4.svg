@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e8efe3"/>
-<circle cx="160" cy="120" r="70" fill="none" stroke="#6f8f5f" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#6f8f5f">不锈钢手冲细口壶 900ml</text>
+
+    <circle cx="150" cy="150" r="45" fill="none" stroke="#6f8f5f" stroke-width="3"/>
+    <path d="M150 105 C150 75 200 70 205 55" fill="none" stroke="#6f8f5f" stroke-width="3"/>
+    <path d="M205 55 L215 48 L208 62 Z" fill="#6f8f5f"/>
+    <path d="M115 135 L85 120 L90 95 L115 110" fill="none" stroke="#6f8f5f" stroke-width="3"/>
+    <path d="M150 175 L150 195 M135 195 L165 195" stroke="#6f8f5f" stroke-width="2"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#6f8f5f">不锈钢手冲细口壶 900ml</text>
 </svg>

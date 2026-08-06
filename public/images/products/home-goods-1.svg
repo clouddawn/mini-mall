@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
 <rect width="320" height="240" fill="#e8efe3"/>
-<path d="M100 160 L160 60 L220 160 Z" fill="none" stroke="#6f8f5f" stroke-width="2"/>
-<text x="160" y="205" text-anchor="middle" font-family="serif" font-size="20" fill="#6f8f5f">亚麻桌布 · 燕麦色 160cm</text>
+
+    <path d="M90 60 L230 60 L230 140 C220 130 210 145 200 140 C190 135 180 145 170 140 C160 135 150 145 140 140 C130 135 120 145 110 140 C100 135 95 140 90 140 Z" fill="none" stroke="#6f8f5f" stroke-width="3"/>
+    <path d="M105 75 L215 75 M100 90 L220 90 M95 105 L225 105 M92 120 L228 120" stroke="#6f8f5f" stroke-width="1.5" stroke-dasharray="6 6"/>
+    <circle cx="160" cy="100" r="5" fill="#6f8f5f"/>
+<text x="160" y="218" text-anchor="middle" font-family="serif" font-size="20" fill="#6f8f5f">亚麻桌布 · 燕麦色 160cm</text>
 </svg>
