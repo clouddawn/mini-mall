@@ -19,7 +19,7 @@ export function LoginForm() {
           {state.error}
         </p>
       )}
-      <Input name="email" type="email" label="邮箱" placeholder="you@example.com" required autoComplete="email" />
+      <Input name="login" label="邮箱或昵称" placeholder="you@example.com / 昵称" required autoComplete="username" />
       <Input
         name="password"
         type="password"
