@@ -2,14 +2,31 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatPrice } from '@/types'
 import { Button } from '@/components/ui/Button'
+import { Pagination } from '@/components/ui/Pagination'
 import { DeleteButton } from '@/components/admin/DeleteButton'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminProductsPage() {
+const PAGE_SIZE = 10
+
+interface AdminProductsPageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
+  const params = await searchParams
+  const requestedPage = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1)
+
+  const total = await prisma.product.count()
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  // 超界页码收敛到末页，避免 `?page=999` 显示误导性的空状态
+  const page = Math.min(requestedPage, totalPages)
+
   const products = await prisma.product.findMany({
     include: { category: true },
     orderBy: { createdAt: 'desc' },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   })
 
   return (
@@ -18,7 +35,7 @@ export default async function AdminProductsPage() {
         <div>
           <p className="text-[10px] tracking-[0.3em] text-ink-faint uppercase">Products</p>
           <h1 className="font-display mt-1 text-3xl font-semibold">商品管理</h1>
-          <p className="num mt-1 text-xs text-ink-faint">共 {products.length} 件商品</p>
+          <p className="num mt-1 text-xs text-ink-faint">共 {total} 件商品</p>
         </div>
         <Button href="/admin/products/new">＋ 新增商品</Button>
       </div>
@@ -79,6 +96,12 @@ export default async function AdminProductsPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        hrefFor={(p) => (p > 1 ? `/admin/products?page=${p}` : '/admin/products')}
+      />
     </div>
   )
 }
